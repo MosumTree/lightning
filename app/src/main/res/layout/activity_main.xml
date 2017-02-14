@@ -28,29 +28,36 @@
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 android:text="Lightning" />
-            <!--
-            <ImageView
-                android:id="@+id/rightmenu"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentRight="true"
-                android:padding="12dp"
-                android:src="@drawable/p_center" />
-            -->
+
         </RelativeLayout>
 
-
-
-        <!-- <LinearLayout
-            android:id="@+id/content"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/title_bar"
-            android:orientation="vertical" /> -->
+            android:layout_height="wrap_content"
+            android:id="@+id/context"
+            android:layout_below="@+id/title_bar">
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_bt"
+                android:text="search"/>
+        </RelativeLayout>
+        <!--测试代码-->
+        <!--<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_bar">
+            <ListView
+                android:id="@+id/wifilist"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </ListView>
+        </RelativeLayout>-->
 
 
 
     </RelativeLayout>
+
     <RelativeLayout
         android:id="@+id/left"
         android:layout_width="200dp"
