@@ -8,16 +8,17 @@
     <RelativeLayout
         android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:background="@color/theme_divider">
         <RelativeLayout
             android:id="@+id/title_bar"
             android:layout_width="match_parent"
             android:layout_height="38dp"
-            android:background="#0e87e9" >
+            android:background="@color/colorPrimaryDark" >
             <ImageView
                 android:id="@+id/leftmenu"
-                android:layout_width="38dp"
-                android:layout_height="38dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:paddingLeft="10dp"
 
                 android:src="@drawable/menu" />
@@ -25,23 +26,41 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="38dp"
+                android:textSize="20sp"
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 android:text="Lightning" />
 
         </RelativeLayout>
 
+
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/context"
-            android:layout_below="@+id/title_bar">
-            <android.support.v7.widget.AppCompatButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/search_bt"
-                android:text="search"/>
+            android:layout_height="250dp"
+            android:layout_below="@+id/title_bar"
+            android:id="@+id/main_context"
+            android:background="@color/colorPrimaryDark">
+
         </RelativeLayout>
+
+
+        <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/context"
+        android:layout_below="@+id/main_context">
+        <android.support.v7.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/search_bt"
+            android:text="search"/>
+        <android.support.v7.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/netlist_bt"
+            android:layout_toRightOf="@+id/search_bt"
+            android:text="netlist"/>
+    </RelativeLayout>
         <!--测试代码-->
         <!--<RelativeLayout
             android:layout_width="match_parent"
