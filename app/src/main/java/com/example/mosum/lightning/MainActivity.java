@@ -41,7 +41,7 @@ public class MainActivity extends FragmentActivity {
 
     private Button searchbt;
     private Button netlistbt;
-
+    private Button filelistbt;
     //底部列表
     private SweetSheet mSweetSheet;
     private RelativeLayout rl;
@@ -83,6 +83,17 @@ public class MainActivity extends FragmentActivity {
                 mSweetSheet.toggle();
             }
         });
+
+        filelistbt = (Button) findViewById(R.id.filelist_bt);
+        filelistbt.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent,1);
+            }
+        });
     }
 
 
@@ -91,12 +102,12 @@ public class MainActivity extends FragmentActivity {
     //初始化侧边栏菜单
     private void initLeftmenu() {
         list = new ArrayList<ContentModel>();
-        list.add(new ContentModel(R.drawable.slidemenu_normalmap, "普通地图", 1));
-        list.add(new ContentModel(R.drawable.slidemenu_statemap, "卫星地图", 2));
-        list.add(new ContentModel(R.drawable.slidemenu_normalmode, "普通模式", 3));
-        list.add(new ContentModel(R.drawable.slidemenu_followmode, "跟随模式", 4));
-        list.add(new ContentModel(R.drawable.slidemenu_compasmode, "罗盘模式", 5));
-        list.add(new ContentModel(R.drawable.slidemenu_buslocation, "校车位置", 6));
+        list.add(new ContentModel(R.drawable.left_account, "account", 1));
+        list.add(new ContentModel(R.drawable.left_nearby, "nearby", 2));
+        list.add(new ContentModel(R.drawable.left_dev, "dev message", 3));
+        list.add(new ContentModel(R.drawable.left_history, "history", 4));
+        list.add(new ContentModel(R.drawable.left_setting, "setting", 5));
+        list.add(new ContentModel(R.drawable.left_about, "about", 6));
     }
     //底部列表视图设置
     private void setupRecyclerView() {

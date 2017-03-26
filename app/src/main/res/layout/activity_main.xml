@@ -5,16 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.mosum.lightning.MainActivity">
+
     <RelativeLayout
         android:id="@+id/fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/theme_divider">
+
         <RelativeLayout
             android:id="@+id/title_bar"
             android:layout_width="match_parent"
             android:layout_height="38dp"
-            android:background="@color/colorPrimaryDark" >
+            android:background="@color/colorPrimaryDark">
+
             <ImageView
                 android:id="@+id/leftmenu"
                 android:layout_width="30dp"
@@ -26,41 +29,57 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="38dp"
-                android:textSize="20sp"
                 android:layout_centerInParent="true"
                 android:gravity="center"
-                android:text="Lightning" />
+                android:text="Lightning"
+                android:textColor="#fff"
+                android:textSize="20sp" />
 
         </RelativeLayout>
 
 
         <RelativeLayout
+            android:id="@+id/main_context"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_below="@+id/title_bar"
-            android:id="@+id/main_context"
             android:background="@color/colorPrimaryDark">
 
         </RelativeLayout>
 
 
         <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/context"
-        android:layout_below="@+id/main_context">
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
+            android:id="@+id/context"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/search_bt"
-            android:text="search"/>
-        <android.support.v7.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/netlist_bt"
-            android:layout_toRightOf="@+id/search_bt"
-            android:text="netlist"/>
-    </RelativeLayout>
+            android:layout_below="@+id/main_context">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/search_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="search" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/netlist_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/search_bt"
+                android:layout_margin="5dp"
+                android:text="netlist" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/filelist_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="filelist"
+
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/netlist_bt"
+                android:layout_toEndOf="@+id/netlist_bt" />
+        </RelativeLayout>
         <!--测试代码-->
         <!--<RelativeLayout
             android:layout_width="match_parent"
@@ -74,7 +93,6 @@
         </RelativeLayout>-->
 
 
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -82,12 +100,32 @@
         android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@android:color/white" >
-
-        <ListView
-            android:id="@+id/left_listview"
+        android:background="@android:color/white">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </ListView>
+            android:layout_height="150dp"
+            android:id="@+id/left_header">
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#666"
+            android:id="@+id/left_border"
+            android:layout_below="@+id/left_header">
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/left_border">
+            <ListView
+                android:id="@+id/left_listview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </ListView>
+        </RelativeLayout>
+
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>
