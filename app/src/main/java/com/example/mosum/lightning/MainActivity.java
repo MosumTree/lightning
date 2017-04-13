@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -27,7 +28,8 @@ import java.util.List;
 
 import ui.ContentAdapter;
 import ui.ContentModel;
-
+import ui.RippleImageView;
+import ui.WaterWaveView;
 import static android.R.id.list;
 import static com.mingle.sweetsheet.R.id.rl;
 
@@ -39,9 +41,13 @@ public class MainActivity extends FragmentActivity {
     private List<ContentModel> list;
     private ContentAdapter adapter;
 
+    //主界面下部效果测试按钮
     private Button searchbt;
     private Button netlistbt;
     private Button filelistbt;
+    private Button stopbt;
+    //主界面闪电按钮
+    private RippleImageView rippleImageView;
     //底部列表
     private SweetSheet mSweetSheet;
     private RelativeLayout rl;
@@ -52,6 +58,7 @@ public class MainActivity extends FragmentActivity {
         leftMenu = (ImageView) findViewById(R.id.leftmenu);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         leftlistView = (ListView) findViewById(R.id.left_listview);
+        rippleImageView=(RippleImageView)findViewById(R.id.rippleImageView);
         fm = getSupportFragmentManager();
         initLeftmenu();
         adapter = new ContentAdapter(this, list);
@@ -63,7 +70,29 @@ public class MainActivity extends FragmentActivity {
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
+        rippleImageView.setOnTouchListener(new View.OnTouchListener() {
 
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                        rippleImageView.startWaveAnimation();
+
+                }
+                else if(event.getAction() == MotionEvent.ACTION_UP) {
+                        rippleImageView.stopWaveAnimation();
+                }
+                return false;
+            }
+
+        });
+/*        rippleImageView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                rippleImageView.startWaveAnimation();
+            }
+        });*/
         searchbt = (Button) findViewById(R.id.search_bt);
         searchbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +123,14 @@ public class MainActivity extends FragmentActivity {
                 startActivityForResult(intent,1);
             }
         });
+        stopbt = (Button) findViewById(R.id.stop_bt);
+        stopbt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rippleImageView.stopWaveAnimation();
+            }
+        });
+
     }
 
 
@@ -162,7 +199,6 @@ public class MainActivity extends FragmentActivity {
     }
     @Override
     public void onBackPressed() {
-
         if (mSweetSheet.isShow()) {
             if (mSweetSheet.isShow()) {
                 mSweetSheet.dismiss();
