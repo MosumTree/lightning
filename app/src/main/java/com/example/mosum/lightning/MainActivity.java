@@ -1,6 +1,9 @@
 package com.example.mosum.lightning;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -26,6 +29,7 @@ import com.mingle.sweetpick.SweetSheet;
 import java.util.ArrayList;
 import java.util.List;
 
+import connect.WifiP2PReceiver;
 import ui.ContentAdapter;
 import ui.ContentModel;
 import ui.RippleImageView;
@@ -48,17 +52,26 @@ public class MainActivity extends FragmentActivity {
     private Button stopbt;
     //主界面闪电按钮
     private RippleImageView rippleImageView;
+    private Button ligntningBt;
     //底部列表
     private SweetSheet mSweetSheet;
     private RelativeLayout rl;
+
+    //广播 wifiP2P
+    private final IntentFilter intentFilter = new IntentFilter();
+    private WifiP2pManager.Channel mChannel;
+    private WifiP2pManager mManager;
+    private WifiP2PReceiver wifiP2PReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        leftMenu = (ImageView) findViewById(R.id.leftmenu);
+           leftMenu = (ImageView) findViewById(R.id.leftmenu);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         leftlistView = (ListView) findViewById(R.id.left_listview);
         rippleImageView=(RippleImageView)findViewById(R.id.rippleImageView);
+        ligntningBt= (Button) findViewById(R.id.ligntning_btn);
         fm = getSupportFragmentManager();
         initLeftmenu();
         adapter = new ContentAdapter(this, list);
@@ -70,29 +83,23 @@ public class MainActivity extends FragmentActivity {
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
-        rippleImageView.setOnTouchListener(new View.OnTouchListener() {
+        ligntningBt.setOnTouchListener(new View.OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                        rippleImageView.startWaveAnimation();
+                    rippleImageView.startWaveAnimation();
 
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP) {
-                        rippleImageView.stopWaveAnimation();
+                    rippleImageView.stopWaveAnimation();
                 }
                 return false;
             }
 
         });
-/*        rippleImageView.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                rippleImageView.startWaveAnimation();
-            }
-        });*/
         searchbt = (Button) findViewById(R.id.search_bt);
         searchbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +137,26 @@ public class MainActivity extends FragmentActivity {
                 rippleImageView.stopWaveAnimation();
             }
         });
+
+
+        //wifiP2P实现设备的连接
+        wifiP2PReceiver = new WifiP2PReceiver();
+        //  Indicates a change in the Wi-Fi P2P status.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+
+        // Indicates a change in the list of available peers.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+
+        // Indicates the state of Wi-Fi P2P connectivity has changed.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+
+        // Indicates this device's details have changed.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+        //获得　WifiP2pManager　的实例，并调用它的　initialize() 方法。该方法将返回 WifiP2pManager.Channel 对象。 我们的应用将在后面使用该对象连接 Wi-Fi P2P 框架
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+
 
     }
 
@@ -206,7 +233,11 @@ public class MainActivity extends FragmentActivity {
         } else {
             super.onBackPressed();
         }
+    }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        wifiP2PReceiver = new WifiP2PReceiver();
     }
 }

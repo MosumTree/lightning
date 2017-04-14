@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_below="@+id/title_bar"
-            android:gravity="center"
+            android:layout_gravity="center"
             android:background="@color/colorPrimaryDark">
             <ui.RippleImageView
                 android:id="@+id/rippleImageView"
@@ -53,6 +53,14 @@
                 app:show_spacing_time="700"
                 app:imageViewWidth="160dp"
                 app:imageViewHeigth="160dp">
+
+                <Button
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/ligntning_btn"
+                    android:background="#00000000"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true" />
             </ui.RippleImageView>
         </RelativeLayout>
 
@@ -95,7 +103,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:text="stop"
-
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/filelist_bt"
                 android:layout_toEndOf="@+id/filelist_bt" />
