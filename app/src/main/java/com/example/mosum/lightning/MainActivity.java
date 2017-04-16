@@ -3,12 +3,18 @@ package com.example.mosum.lightning;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +43,7 @@ import ui.WaterWaveView;
 import static android.R.id.list;
 import static com.mingle.sweetsheet.R.id.rl;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements  WifiP2pManager.PeerListListener,WifiP2pManager.ConnectionInfoListener {
     private DrawerLayout drawerLayout;
     private ImageView leftMenu;
     private ListView leftlistView;
@@ -58,16 +64,21 @@ public class MainActivity extends FragmentActivity {
     private RelativeLayout rl;
 
     //广播 wifiP2P
-    private final IntentFilter intentFilter = new IntentFilter();
+    private IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager.Channel mChannel;
     private WifiP2pManager mManager;
     private WifiP2PReceiver wifiP2PReceiver;
+    private WifiP2pManager.PeerListListener peerListListener;
+    private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>(); // 用来存放发现的节点
+    private static WifiP2pDevice device;//设备
+    private boolean isConnected=false;
+    private  String[] peersname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-           leftMenu = (ImageView) findViewById(R.id.leftmenu);
+        leftMenu = (ImageView) findViewById(R.id.leftmenu);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         leftlistView = (ListView) findViewById(R.id.left_listview);
         rippleImageView=(RippleImageView)findViewById(R.id.rippleImageView);
@@ -90,6 +101,26 @@ public class MainActivity extends FragmentActivity {
                 if(event.getAction() == MotionEvent.ACTION_DOWN) {
 
                     rippleImageView.startWaveAnimation();
+                    setupRecyclerView();
+                    mManager.discoverPeers(mChannel,
+                            new WifiP2pManager.ActionListener() {
+
+                                @Override
+                                public void onSuccess() {
+                                    Log.d(MainActivity.this.getClass().getName(),
+                                            "检测P2P进程成功");
+                                    System.out.println("discover");
+
+                                }
+
+                                @Override
+                                public void onFailure(int reason) {
+                                    Log.d(MainActivity.this.getClass().getName(),
+                                            "检测P2P进程失败");
+                                    System.out.println("undiscover");
+                                }
+                            });
+
 
                 }
                 else if(event.getAction() == MotionEvent.ACTION_UP) {
@@ -111,7 +142,7 @@ public class MainActivity extends FragmentActivity {
 
 
         rl = (RelativeLayout) findViewById(R.id.fragment_layout);
-        setupRecyclerView();
+
         netlistbt = (Button) findViewById(R.id.netlist_bt);
         netlistbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,18 +170,16 @@ public class MainActivity extends FragmentActivity {
         });
 
 
-        //wifiP2P实现设备的连接
-        wifiP2PReceiver = new WifiP2PReceiver();
-        //  Indicates a change in the Wi-Fi P2P status.
+        // 状态发生变化
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
 
-        // Indicates a change in the list of available peers.
+        // peers列表发生变化
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
 
-        // Indicates the state of Wi-Fi P2P connectivity has changed.
+        // p2p连接发生变化
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
 
-        // Indicates this device's details have changed.
+        // 设备信息发生变化.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         //获得　WifiP2pManager　的实例，并调用它的　initialize() 方法。该方法将返回 WifiP2pManager.Channel 对象。 我们的应用将在后面使用该对象连接 Wi-Fi P2P 框架
@@ -178,27 +207,13 @@ public class MainActivity extends FragmentActivity {
 
         final ArrayList<MenuEntity> list = new ArrayList<>();
         //添加假数据
-        MenuEntity menuEntity1 = new MenuEntity();
-        menuEntity1.iconId = R.drawable.ic_account_child;
-        menuEntity1.titleColor = 0xff000000;
-        menuEntity1.title = "code";
-        MenuEntity menuEntity = new MenuEntity();
-        menuEntity.iconId = R.drawable.ic_account_child;
-        menuEntity.titleColor = 0xffb3b3b3;
-        menuEntity.title = "QQ";
-        list.add(menuEntity1);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
-        list.add(menuEntity);
+        for (int i=0;i<peers.size();i++){
+            MenuEntity menuEntity1 = new MenuEntity();
+            menuEntity1.iconId = R.drawable.ic_account_child;
+            menuEntity1.titleColor = 0xff000000;
+            menuEntity1.title = peersname[i];
+            list.add(menuEntity1);
+        }
         // SweetSheet 控件,根据 rl 确认位置
         mSweetSheet = new SweetSheet(rl);
 
@@ -238,6 +253,76 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        wifiP2PReceiver = new WifiP2PReceiver();
+        wifiP2PReceiver = new WifiP2PReceiver(mManager, mChannel,this);
+        registerReceiver(wifiP2PReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(wifiP2PReceiver);
+    }
+
+
+
+    /**
+     * 连接或者断开连接的处理方法
+     */
+    private void connectToPeer() {
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        Log.d("FIND_DEVICE", "设备名称是："+device.deviceName+"---"+"设备地址是:"+device.deviceAddress);
+        config.wps.setup = WpsInfo.PBC;
+        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+
+            @Override
+            public void onSuccess() {
+                Log.d(MainActivity.this.getClass().getName(), "成功连接到"
+                        + device.deviceName);
+                isConnected=true;
+                Toast.makeText(MainActivity.this, "成功连接到" + device.deviceName,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(MainActivity.this.getClass().getName(), "连接失败");
+                Toast.makeText(MainActivity.this, "连接失败", Toast.LENGTH_SHORT)
+                        .show();
+                isConnected=false;
+            }
+        });
+    }
+
+    @Override
+    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+
+    }
+
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList peersLists) {
+        peers.clear();
+        peers.addAll(peersLists.getDeviceList());
+        if (peers.size() == 0) {
+            System.out.print("not have");
+            Log.d(this.getClass().getName(), "No devices found");
+            peersname = new String[1];
+            if (peersname.length>0){
+                peersname[0]="No Devices";
+            }else {
+                peersname = new String[1];
+                peersname[0]="No Devices";
+            }
+            return;
+        }
+        else {
+            peersname = new String[peers.size()];
+            int i=0;
+            for(WifiP2pDevice device: peers){
+                peersname[i++]=device.deviceName;
+            }
+
+        }
+
     }
 }
