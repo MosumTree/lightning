@@ -70,7 +70,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private WifiP2PReceiver wifiP2PReceiver;
     private WifiP2pManager.PeerListListener peerListListener;
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>(); // 用来存放发现的节点
-    private static WifiP2pDevice device;//设备
+    //private static WifiP2pDevice device;//设备
     private boolean isConnected=false;
     private  String[] peersname;
 
@@ -207,6 +207,11 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
 
         final ArrayList<MenuEntity> list = new ArrayList<>();
         //添加假数据
+        MenuEntity menuEntity = new MenuEntity();
+        menuEntity.iconId = R.drawable.left_account;
+        menuEntity.titleColor = 0xff000000;
+        menuEntity.title = "Users";
+        list.add(menuEntity);
         for (int i=0;i<peers.size();i++){
             MenuEntity menuEntity1 = new MenuEntity();
             menuEntity1.iconId = R.drawable.ic_account_child;
@@ -230,7 +235,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 //即时改变当前项的颜色
                 list.get(position).titleColor = 0xff5823ff;
                 ((RecyclerViewDelegate) mSweetSheet.getDelegate()).notifyDataSetChanged();
-
+                connectToPeer(position);
                 //根据返回值, true 会关闭 SweetSheet ,false 则不会.
                 Toast.makeText(MainActivity.this, menuEntity1.title + "  " + position, Toast.LENGTH_SHORT).show();
                 return false;
@@ -268,7 +273,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     /**
      * 连接或者断开连接的处理方法
      */
-    private void connectToPeer() {
+    private void connectToPeer(int num) {
+        final WifiP2pDevice device = peers.get(num-1);
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.deviceAddress;
         Log.d("FIND_DEVICE", "设备名称是："+device.deviceName+"---"+"设备地址是:"+device.deviceAddress);
