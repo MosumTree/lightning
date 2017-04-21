@@ -56,6 +56,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private Button netlistbt;
     private Button filelistbt;
     private Button stopbt;
+    private Button transferbt;
     //主界面闪电按钮
     private RippleImageView rippleImageView;
     private Button ligntningBt;
@@ -169,7 +170,14 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
-
+        transferbt = (Button) findViewById(R.id.transfer_bt);
+        transferbt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, TransferActivity.class);
+                startActivity(intent);
+            }
+        });
         // 状态发生变化
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
 

@@ -20,4 +20,7 @@
     <color name="theme_secondary_text_inverted">#8affffff</color>
     <color name="theme_icons">#FFFFFF</color>
     <color name="theme_divider">#B6B6B6</color>
+
+    <color name="tint">#f44336</color>
+    <color name="tint_background">#42f44336</color>
 </resources>

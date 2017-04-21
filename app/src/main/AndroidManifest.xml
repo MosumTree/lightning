@@ -26,6 +26,9 @@
         <activity android:name=".SearchActivity">
 
         </activity>
+        <activity android:name=".TransferActivity">
+
+        </activity>
     </application>
 
 </manifest>

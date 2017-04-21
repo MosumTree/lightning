@@ -75,7 +75,7 @@
                 android:id="@+id/search_bt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="3dp"
                 android:text="search" />
 
             <android.support.v7.widget.AppCompatButton
@@ -83,14 +83,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/search_bt"
-                android:layout_margin="5dp"
+                android:layout_margin="3dp"
                 android:text="netlist" />
 
             <android.support.v7.widget.AppCompatButton
             android:id="@+id/filelist_bt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="3dp"
             android:text="filelist"
 
             android:layout_alignParentTop="true"
@@ -101,11 +101,23 @@
                 android:id="@+id/stop_bt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="3dp"
                 android:text="stop"
                 android:layout_alignParentTop="true"
                 android:layout_toRightOf="@+id/filelist_bt"
                 android:layout_toEndOf="@+id/filelist_bt" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/content_2"
+            android:layout_below="@+id/context">
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/transfer_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:text="transfer" />
         </RelativeLayout>
         <!--测试代码-->
         <!--<RelativeLayout
