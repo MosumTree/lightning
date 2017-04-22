@@ -3,6 +3,7 @@ package com.example.mosum.lightning;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -35,6 +36,7 @@ import com.mingle.sweetpick.SweetSheet;
 import java.util.ArrayList;
 import java.util.List;
 
+import connect.FileTransferService;
 import connect.WifiP2PReceiver;
 import ui.ContentAdapter;
 import ui.ContentModel;
@@ -60,6 +62,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     //主界面闪电按钮
     private RippleImageView rippleImageView;
     private Button ligntningBt;
+    private boolean isSearchFlag=true;
     //底部列表
     private SweetSheet mSweetSheet;
     private RelativeLayout rl;
@@ -74,6 +77,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     //private static WifiP2pDevice device;//设备
     private boolean isConnected=false;
     private  String[] peersname;
+    private WifiP2pInfo info;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,43 +99,42 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 drawerLayout.openDrawer(Gravity.LEFT);
             }
         });
-        ligntningBt.setOnTouchListener(new View.OnTouchListener() {
+        ligntningBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-
+            public void onClick(View v) {
+                if (isSearchFlag){
                     rippleImageView.startWaveAnimation();
                     setupRecyclerView();
+                    isSearchFlag=false;
                     mManager.discoverPeers(mChannel,
-                            new WifiP2pManager.ActionListener() {
+                        new WifiP2pManager.ActionListener() {
 
-                                @Override
-                                public void onSuccess() {
-                                    Log.d(MainActivity.this.getClass().getName(),
-                                            "检测P2P进程成功");
-                                    System.out.println("discover");
+                            @Override
+                            public void onSuccess() {
+                                Log.d(MainActivity.this.getClass().getName(),
+                                        "检测P2P进程成功");
+                                System.out.println("discover");
 
-                                }
+                            }
 
-                                @Override
-                                public void onFailure(int reason) {
-                                    Log.d(MainActivity.this.getClass().getName(),
-                                            "检测P2P进程失败");
-                                    System.out.println("undiscover");
-                                }
-                            });
-
+                            @Override
+                            public void onFailure(int reason) {
+                                Log.d(MainActivity.this.getClass().getName(),
+                                        "检测P2P进程失败");
+                                System.out.println("undiscover");
+                            }
+                        });
 
                 }
-                else if(event.getAction() == MotionEvent.ACTION_UP) {
+                else {
+                    isSearchFlag=true;
                     rippleImageView.stopWaveAnimation();
                 }
-                return false;
             }
-
         });
 
+        //打开搜索界面
         searchbt = (Button) findViewById(R.id.search_bt);
         searchbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +147,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
 
         rl = (RelativeLayout) findViewById(R.id.fragment_layout);
 
+        //打开搜索到的wifiP2P用户列表
         netlistbt = (Button) findViewById(R.id.netlist_bt);
         netlistbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,7 +155,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 mSweetSheet.toggle();
             }
         });
-
+        //打开本地文件
         filelistbt = (Button) findViewById(R.id.filelist_bt);
         filelistbt.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -162,6 +166,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 startActivityForResult(intent,1);
             }
         });
+        //停止主界面按钮波纹效果
         stopbt = (Button) findViewById(R.id.stop_bt);
         stopbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,7 +174,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 rippleImageView.stopWaveAnimation();
             }
         });
-
+        //打开文件互传界面
         transferbt = (Button) findViewById(R.id.transfer_bt);
         transferbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +183,11 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 startActivity(intent);
             }
         });
+
+        /*
+        * 创建wifiP2P广播监听
+        *
+        * */
         // 状态发生变化
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
 
@@ -245,13 +255,14 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 ((RecyclerViewDelegate) mSweetSheet.getDelegate()).notifyDataSetChanged();
                 connectToPeer(position);
                 //根据返回值, true 会关闭 SweetSheet ,false 则不会.
-                Toast.makeText(MainActivity.this, menuEntity1.title + "  " + position, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, menuEntity1.title + "  " + position, Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
 
 
     }
+    //重写后退键
     @Override
     public void onBackPressed() {
         if (mSweetSheet.isShow()) {
@@ -307,18 +318,32 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
     }
+    private void disconnect() {
 
+        mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onFailure(int reasonCode) {
+            }
+
+            @Override
+            public void onSuccess() {
+                // 将对等信息情况
+                peers.clear();
+                isConnected=false;
+            }
+        });
+    }
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo info) {
 
     }
-
+    //获取搜索到的设备列表
     @Override
     public void onPeersAvailable(WifiP2pDeviceList peersLists) {
         peers.clear();
         peers.addAll(peersLists.getDeviceList());
+
         if (peers.size() == 0) {
-            System.out.print("not have");
             Log.d(this.getClass().getName(), "No devices found");
             peersname = new String[1];
             if (peersname.length>0){
@@ -335,8 +360,28 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             for(WifiP2pDevice device: peers){
                 peersname[i++]=device.deviceName;
             }
-
+            setupRecyclerView();
         }
 
+    }
+    //将选择好的文件数据返回时的回调函数
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 20) {
+            super.onActivityResult(requestCode, resultCode, data);
+            Uri uri = data.getData();//获取文件所在位置
+            Intent serviceIntent = new Intent(MainActivity.this,
+                    FileTransferService.class);
+
+            serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+            serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH,
+                    uri.toString());//将位置传入Service
+
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                    info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
+            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
+                    8988);//传入端口port
+            MainActivity.this.startService(serviceIntent);
+        }
     }
 }
