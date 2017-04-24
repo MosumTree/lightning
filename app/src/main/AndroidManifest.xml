@@ -29,6 +29,8 @@
         <activity android:name=".TransferActivity">
 
         </activity>
+        <service android:name="connect.FileTransferService"
+            android:enabled="true"/>
     </application>
 
 </manifest>

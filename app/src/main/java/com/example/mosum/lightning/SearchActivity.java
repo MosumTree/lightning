@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 /**
  * Created by mosum on 2017/2/14.
+ * 搜索页面，用户搜索资源时进入的页面
  */
 
 public class SearchActivity extends AppCompatActivity {

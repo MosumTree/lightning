@@ -25,7 +25,6 @@ public class FileTransferService extends IntentService{
     public static final String EXTRAS_FILE_PATH = "sf_file_url";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "sf_go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "sf_go_port";
-
     public FileTransferService(String name) {
         super(name);
     }
@@ -35,6 +34,8 @@ public class FileTransferService extends IntentService{
     }
     @Override
     protected void onHandleIntent(Intent intent) {
+        System.out.print("JUST SAY SOMETHING");
+        Log.i("xyz", "action is"+intent.getAction());
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             /*
@@ -45,7 +46,7 @@ public class FileTransferService extends IntentService{
                     EXTRAS_GROUP_OWNER_ADDRESS);
             Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
-
+            Log.i("xyz", "port is:"+port);
             try {
                 Log.d("xyz", "Opening client socket - ");
                 socket.bind(null);
@@ -58,12 +59,14 @@ public class FileTransferService extends IntentService{
 				/*returns an output stream to write data into this socket*/
                 OutputStream stream = socket.getOutputStream();
                 ContentResolver cr = context.getContentResolver();
+                //打开本地文件
                 InputStream is = null;
                 try {
                     is = cr.openInputStream(Uri.parse(fileUri));
                 } catch (FileNotFoundException e) {
                     Log.d("xyz", e.toString());
                 }
+                //将本地文件复制到输出文件
                 FileServerAsyncTask.copyFile(is, stream);
                 Log.d("xyz", "Client: Data written");
             } catch (IOException e) {

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.mosum.lightning.MainActivity;
@@ -45,7 +46,16 @@ public class WifiP2PReceiver extends BroadcastReceiver {
                 Toast.makeText(mactivity, "发现设备", Toast.LENGTH_SHORT).show();
             }
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+            NetworkInfo networkInfo = (NetworkInfo) intent
+                    .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
+            if (networkInfo.isConnected()) {
+                Log.i("xyz", "已连接");
+                wifiP2pManager.requestConnectionInfo(channel, mactivity);
+            } else {
+                Log.i("xyz", "断开连接");
+                return;
+            }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
         }
     }

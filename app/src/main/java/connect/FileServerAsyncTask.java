@@ -26,23 +26,30 @@ public class FileServerAsyncTask extends
         AsyncTask<Void, Void, String> {
 
     private Context context;
-    private TextView statusText;
+
 
     /**
      * @param context
-     * @param statusText
      */
-    public FileServerAsyncTask(Context context, View statusText) {
+    public FileServerAsyncTask(Context context) {
         this.context = context;
-        this.statusText = (TextView) statusText;
-    }
 
+    }
+    /**
+     * 这里的Integer参数对应AsyncTask中的第一个参数
+     * 这里的String返回值对应AsyncTask的第三个参数
+     * 该方法并不运行在UI线程当中，主要用于异步操作，所有在该方法中不能对UI当中的空间进行设置和修改
+     * 但是可以调用publishProgress方法触发onProgressUpdate对UI进行操作
+     */
     @Override
     protected String doInBackground(Void... params) {
         try {
             Log.i("xyz", "file doinback");
-            ServerSocket serverSocket = new ServerSocket(8988);
-            Socket client = serverSocket.accept();
+            //服务器端socket
+            ServerSocket serverSocket = new ServerSocket(8981);//设置服务器监听端口
+            Log.i("xyz", "服务器监听端口创建完毕");
+            Socket client = serverSocket.accept();//从连接队列中取出一个连接，如果没有则等待
+            Log.i("xyz", "创建客户端socket完毕");
             final File f = new File(
                     Environment.getExternalStorageDirectory() + "/"
                             + "com.miko.zd" + "/wifip2pshared-"
@@ -55,7 +62,7 @@ public class FileServerAsyncTask extends
             f.createNewFile();
 
 
-                /*Returns an input stream to read data from this socket*/
+            /*Returns an input stream to read data from this socket*/
             InputStream inputstream = client.getInputStream();
             copyFile(inputstream, new FileOutputStream(f));
             serverSocket.close();
@@ -79,7 +86,6 @@ public class FileServerAsyncTask extends
         Toast.makeText(context, "result"+result, Toast.LENGTH_SHORT).show();
 
         if (result != null) {
-            statusText.setText("File copied - " + result);
             Intent intent = new Intent();
             intent.setAction(Intent.ACTION_VIEW);
             intent.setDataAndType(Uri.parse("file://" + result), "image/*");

@@ -118,6 +118,20 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:text="transfer" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/transfer_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/transfer_bt"
+                android:layout_margin="3dp"
+                android:text="sendpicture"/>
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/disconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/transfer_pic"
+                android:layout_margin="3dp"
+                android:text="disconnect"/>
         </RelativeLayout>
         <!--测试代码-->
         <!--<RelativeLayout
@@ -153,6 +167,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@+id/connect_user_title"/>
+
         </RelativeLayout>
 
     </RelativeLayout>
