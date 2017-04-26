@@ -8,8 +8,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:id="@+id/transfer_animation"
-        android:background="@color/colorPrimary">
+        android:id="@+id/transfer_animation">
+
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/progress_bar"
@@ -36,17 +36,18 @@
         android:background="@color/colorPrimaryDark"
         android:weightSum="2"
         >
+
         <TextView
             android:id="@+id/speed"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="0MB/S"
-            android:textColor="#ffffff"
-            android:textAlignment="center"
             android:gravity="center"
-            android:textSize="20dp"
-            />
+            android:text="0MB/S"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="20dp" />
+
         <TextView
             android:id="@+id/amount"
             android:layout_width="wrap_content"

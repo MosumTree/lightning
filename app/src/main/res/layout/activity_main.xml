@@ -146,7 +146,7 @@
         </RelativeLayout>-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="30dp"
             android:background="#dddddd"
             android:id="@+id/connect_user_container"
             android:layout_alignParentBottom="true"
@@ -156,7 +156,7 @@
                 android:id="@+id/connect_user_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginLeft="5dp"
                 android:text="已连接设备"/>
             <TextView
@@ -164,7 +164,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="无设备"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@+id/connect_user_title"/>
 

@@ -80,9 +80,11 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>(); // 用来存放发现的节点
     //private static WifiP2pDevice device;//设备
     private boolean isConnected=false;
-    private  String[] peersname;
+    private String[] peersname;
     private WifiP2pInfo info;
 
+    private TextView connectDevice;
+    private TextView connectDeviceTitle;
     //文件传输
     private FileServerAsyncTask mServerTask;
     @Override
@@ -94,6 +96,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         leftlistView = (ListView) findViewById(R.id.left_listview);
         rippleImageView=(RippleImageView)findViewById(R.id.rippleImageView);
         ligntningBt= (Button) findViewById(R.id.ligntning_btn);
+        connectDevice = (TextView)findViewById(R.id.connect_user) ;
+        connectDevice.setVisibility(View.GONE);
         fm = getSupportFragmentManager();
         initLeftmenu();
         adapter = new ContentAdapter(this, list);
@@ -333,6 +337,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 Log.d(MainActivity.this.getClass().getName(), "成功连接到"
                         + device.deviceName);
                 isConnected=true;
+                connectDevice.setText(device.deviceName);
+                connectDevice.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "成功连接到" + device.deviceName,
                         Toast.LENGTH_SHORT).show();
             }
@@ -435,7 +441,12 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                     info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
             serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
                     8981);//传入端口port
+            serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_TYPE,
+                    1);//传入文件类型
             MainActivity.this.startService(serviceIntent);
+
+            Intent transferIntent = new Intent(MainActivity.this, TransferActivity.class);
+            startActivity(transferIntent);
         }
     }
 }
