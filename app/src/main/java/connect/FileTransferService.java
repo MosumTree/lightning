@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +93,7 @@ public class FileTransferService extends IntentService{
                     e.printStackTrace();
                 }
                 //将本地文件复制到输出文件
-                FileServerAsyncTask.copyFile(is, mOutputStream,mFileInfo);
+                copyFile(is, mOutputStream,mFileInfo);
                 Log.d("xyz", "Client: Data written");
             } catch (IOException e) {
                 Log.e("xyz", e.getMessage());
@@ -110,6 +111,39 @@ public class FileTransferService extends IntentService{
             }
 
         }
+    }
+
+    public  boolean copyFile(InputStream inputStream, OutputStream out,FileInfo mFileInfo) {
+        byte buf[] = new byte[1024];
+        int len;
+        long fileLength= mFileInfo.getSize();
+        long transferlength=0;
+        long sTime = System.currentTimeMillis();
+        long eTime = 0;
+        DataInputStream dis = new DataInputStream(inputStream);
+        try {
+            while ((len = inputStream.read(buf)) != -1) {
+                transferlength+=len;
+                eTime = System.currentTimeMillis();
+                if(eTime - sTime > 100) { //大于500ms 才进行一次监听
+                    sTime = eTime;
+                    Intent intent = new Intent("send progress");
+                    intent.putExtra("progress", (transferlength * 100/ fileLength));
+                    sendBroadcast(intent);
+                    System.out.println("文件发送了" +  (transferlength * 100/ fileLength) + "%\n");
+                }
+                //
+                //
+                out.write(buf, 0, len);
+
+            }
+            System.out.println("发送完成 \n");
+            out.close();
+            inputStream.close();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
     //给文件添加相关信息
     void parseHeader(OutputStream os) throws Exception {
@@ -129,6 +163,13 @@ public class FileTransferService extends IntentService{
         //写入header
         mOutputStream.write(headbytes);
     }
-    //写输出流文件
-
+    /**
+     * 文件传送的监听
+     */
+    public interface OnSendListener{
+        void onStart();
+        void onProgress(long progress, long total);
+        void onSuccess(FileInfo fileInfo);
+        void onFailure(Throwable t, FileInfo fileInfo);
+    }
 }

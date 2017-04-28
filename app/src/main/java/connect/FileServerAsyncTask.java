@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import utils.FileInfo;
 
 import static transfer.BaseTransfer.BYTE_SIZE_HEADER;
@@ -30,16 +31,26 @@ import static transfer.BaseTransfer.UTF_8;
  * the stream.
  */
 public class FileServerAsyncTask extends
-        AsyncTask<Void, Void, String> {
+        AsyncTask<Void, Integer, String> {
 
     private Context context;
+    private MaterialProgressBar mmaterialProgressBar;
     private FileInfo mFileInfo;
+    private static int progress=0;
+    /**
+     * 文件接收的监听
+     */
+    OnReceiveListener mOnReceiveListener;
     /**
      * @param context
      */
-    public FileServerAsyncTask(Context context) {
+    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar) {
         this.context = context;
+        this.mmaterialProgressBar=materialProgressBar;
 
+    }
+    public void setOnReceiveListener(OnReceiveListener mOnReceiveListener) {
+        this.mOnReceiveListener = mOnReceiveListener;
     }
     /**
      * 这里的Integer参数对应AsyncTask中的第一个参数
@@ -73,6 +84,7 @@ public class FileServerAsyncTask extends
             parseHeader(inputstream);
             Log.i("xyz", "文件的路径："+mFileInfo.getFilePath()+"文件的类型："+mFileInfo.getFileType()+"文件的大小："+mFileInfo.getSize()/1024+"kb");
             copyFile(inputstream, new FileOutputStream(f),mFileInfo);
+
             serverSocket.close();
             return f.getAbsolutePath();
 
@@ -80,6 +92,13 @@ public class FileServerAsyncTask extends
             Log.e("xyz", e.toString());
             return null;
         }
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+        mmaterialProgressBar.setProgress(values[0]);
+        Log.i("progress", ""+values[0]);
     }
 
     /*
@@ -113,17 +132,26 @@ public class FileServerAsyncTask extends
     }
 
 
-    public static boolean copyFile(InputStream inputStream, OutputStream out,FileInfo mFileInfo) {
+    public  boolean copyFile(InputStream inputStream, OutputStream out,FileInfo mFileInfo) {
         byte buf[] = new byte[1024];
         int len;
         long fileLength= mFileInfo.getSize();
-        int transferlength=0;
+        long transferlength=0;
+        long sTime = System.currentTimeMillis();
+        long eTime = 0;
         DataInputStream dis = new DataInputStream(inputStream);
-
         try {
             while ((len = inputStream.read(buf)) != -1) {
                 transferlength+=len;
-                System.out.println("文件接收了" +  (transferlength * 100/ fileLength) + "%\n");
+                eTime = System.currentTimeMillis();
+                if(eTime - sTime > 100) { //大于500ms 才进行一次监听
+                    sTime = eTime;
+                    progress= (int) (transferlength * 100/fileLength);
+                    publishProgress(progress);
+                    System.out.println("文件接收了" +  (transferlength * 100/ fileLength) + "%\n");
+                }
+                //
+                //
                 out.write(buf, 0, len);
 
             }
@@ -148,6 +176,7 @@ public class FileServerAsyncTask extends
             headerBytes[headTotal] = (byte) readByte;
 
             headTotal ++;
+
             if(headTotal == headerBytes.length){
                 break;
             }
@@ -159,5 +188,15 @@ public class FileServerAsyncTask extends
         String[] strArray = jsonStr.split(SPERATOR);
         jsonStr = strArray[1].trim();
         mFileInfo = FileInfo.toObject(jsonStr);
+    }
+    /**
+     * 文件接收的监听
+     */
+    public interface OnReceiveListener{
+        void onStart();
+        //void onGetFileInfo(FileInfo fileInfo);
+        void onProgress(long progress, long total);
+        void onSuccess(FileInfo fileInfo);
+        void onFailure(Throwable t, FileInfo fileInfo);
     }
 }

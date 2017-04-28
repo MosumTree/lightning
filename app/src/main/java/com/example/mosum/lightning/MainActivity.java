@@ -375,9 +375,12 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         //TextView view = (TextView) findViewById(R.id.tv_main);
         if (info.groupFormed && info.isGroupOwner) {
             Log.i("xyz","owner start");
-            mServerTask = new FileServerAsyncTask(MainActivity.this);
+            /*mServerTask = new FileServerAsyncTask(MainActivity.this);
             mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            filelistbt.setVisibility(View.GONE);
+            filelistbt.setVisibility(View.GONE);*/
+            Intent intent=new Intent(MainActivity.this,TransferActivity.class);
+            intent.putExtra("isSend",false);
+            MainActivity.this.startActivity(intent);
         } else if (info.groupFormed) {
             //SetButtonVisible();
             Log.i("xyz","client start");
@@ -431,22 +434,14 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         if (requestCode == 20) {
             super.onActivityResult(requestCode, resultCode, data);
             Uri uri = data.getData();//获取文件所在位置
-            Intent serviceIntent = new Intent(MainActivity.this,
-                    FileTransferService.class);
-            serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-            serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH,
-                    uri.toString());//将位置传入Service
 
-            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                    info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
-            serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
-                    8981);//传入端口port
-            serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_TYPE,
-                    1);//传入文件类型
-            MainActivity.this.startService(serviceIntent);
-
-            Intent transferIntent = new Intent(MainActivity.this, TransferActivity.class);
-            startActivity(transferIntent);
+            Intent transferIntent = new Intent(MainActivity.this,
+                    TransferActivity.class);
+            transferIntent.putExtra("isSend",true);
+            transferIntent.putExtra("url",uri.toString());
+            transferIntent.putExtra("type",1);
+            transferIntent.putExtra("IP",info.groupOwnerAddress.getHostAddress());
+            MainActivity.this.startActivity(transferIntent);
         }
     }
 }

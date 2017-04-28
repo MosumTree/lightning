@@ -146,6 +146,14 @@
         </RelativeLayout>-->
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/content_3"
+            android:layout_below="@+id/content_2"
+            android:background="#ffffff">
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="30dp"
             android:background="#dddddd"
             android:id="@+id/connect_user_container"
