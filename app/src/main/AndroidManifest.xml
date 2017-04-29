@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mosum.lightning">
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -27,6 +28,12 @@
 
         </activity>
         <activity android:name=".TransferActivity">
+
+        </activity>
+        <activity android:name=".DeviceMessage">
+
+        </activity>
+        <activity android:name=".About">
 
         </activity>
         <service android:name="connect.FileTransferService"

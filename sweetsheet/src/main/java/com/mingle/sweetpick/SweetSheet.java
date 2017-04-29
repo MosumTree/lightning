@@ -30,7 +30,7 @@ public class SweetSheet {
     }
 
 
-    private ViewGroup mParentVG;
+    private ViewGroup mParentVG ;
     private Delegate mDelegate;
     private Effect mEffect=new NoneEffect();
     private OnMenuItemClickListener mOnMenuItemClickListener;

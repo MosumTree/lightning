@@ -119,17 +119,17 @@
                 android:layout_margin="3dp"
                 android:text="transfer" />
             <android.support.v7.widget.AppCompatButton
-                android:id="@+id/transfer_pic"
+                android:id="@+id/media"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/transfer_bt"
                 android:layout_margin="3dp"
-                android:text="sendpicture"/>
+                android:text="media"/>
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/disconnect"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/transfer_pic"
+                android:layout_toRightOf="@+id/media"
                 android:layout_margin="3dp"
                 android:text="disconnect"/>
         </RelativeLayout>
@@ -190,13 +190,24 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:id="@+id/left_header">
-
+            android:id="@+id/left_header"
+            android:background="#333"
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="XiaoMi"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:textSize="20dp"
+                android:textColor="#fff"
+                android:background="@drawable/portrait"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#666"
+            android:background="#ddd"
             android:id="@+id/left_border"
             android:layout_below="@+id/left_header">
 
@@ -205,6 +216,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/left_border">
+
             <ListView
                 android:id="@+id/left_listview"
                 android:layout_width="match_parent"

@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -62,7 +63,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private Button filelistbt;
     private Button stopbt;
     private Button transferbt;
-    private Button transferPicBtn;
+    private Button MediaBtn;
     private Button disconnectBtn;
     //主界面闪电按钮
     private RippleImageView rippleImageView;
@@ -110,13 +111,16 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
+
+
+
+
         ligntningBt.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 if (isSearchFlag){
                     rippleImageView.startWaveAnimation();
-                    setupRecyclerView();
                     isSearchFlag=false;
                     mManager.discoverPeers(mChannel,
                         new WifiP2pManager.ActionListener() {
@@ -162,6 +166,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         netlistbt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setupRecyclerView();
                 mSweetSheet.toggle();
             }
         });
@@ -195,9 +200,9 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
-        //图片传输测试
-        transferPicBtn =(Button)findViewById(R.id.transfer_pic);
-        transferPicBtn.setOnClickListener(new View.OnClickListener(){
+        //播放器测试
+        MediaBtn =(Button)findViewById(R.id.media);
+        MediaBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -214,7 +219,37 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
+        //侧边栏监听事件
+        leftlistView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
 
+                switch ((int) id) {
+                    case 1:
+                        setupRecyclerView();
+                        mSweetSheet.toggle();
+                        break;
+                    case 2:
+                        Intent intent2=new Intent(MainActivity.this,DeviceMessage.class);
+                        startActivity(intent2);
+                        break;
+                    case 3:
+
+                        break;
+                    case 4:
+
+                        break;
+                    case 5:
+                        Intent intent6=new Intent(MainActivity.this,About.class);
+                        startActivity(intent6);
+                        break;
+                    default:
+                        break;
+                }
+                drawerLayout.closeDrawer(Gravity.LEFT);
+            }
+        });
         /*
         * 创建wifiP2P广播监听
         *
@@ -244,16 +279,15 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     //初始化侧边栏菜单
     private void initLeftmenu() {
         list = new ArrayList<ContentModel>();
-        list.add(new ContentModel(R.drawable.left_account, "account", 1));
-        list.add(new ContentModel(R.drawable.left_nearby, "nearby", 2));
-        list.add(new ContentModel(R.drawable.left_dev, "dev message", 3));
-        list.add(new ContentModel(R.drawable.left_history, "history", 4));
-        list.add(new ContentModel(R.drawable.left_setting, "setting", 5));
-        list.add(new ContentModel(R.drawable.left_about, "about", 6));
+        list.add(new ContentModel(R.drawable.left_nearby, "nearby", 1));
+        list.add(new ContentModel(R.drawable.left_dev, "device", 2));
+        list.add(new ContentModel(R.drawable.left_history, "history", 3));
+        list.add(new ContentModel(R.drawable.left_setting, "setting", 4));
+        list.add(new ContentModel(R.drawable.left_about, "about", 5));
     }
+
     //底部列表视图设置
     private void setupRecyclerView() {
-
         final ArrayList<MenuEntity> list = new ArrayList<>();
         //添加假数据
         MenuEntity menuEntity = new MenuEntity();
@@ -274,7 +308,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         //设置数据源 (数据源支持设置 list 数组,也支持从菜单中获取)
         mSweetSheet.setMenuList(list);
         //根据设置不同的 Delegate 来显示不同的风格.
-        mSweetSheet.setDelegate(new RecyclerViewDelegate(true));
+        RecyclerViewDelegate mRecycclerViewDelegate=new  RecyclerViewDelegate(true);
+        mSweetSheet.setDelegate(mRecycclerViewDelegate);
         //根据设置不同Effect 来显示背景效果BlurEffect:模糊效果.DimEffect 变暗效果
         mSweetSheet.setBackgroundEffect(new BlurEffect(8));
         //设置点击事件
@@ -293,6 +328,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
 
 
     }
+
     //重写后退键
     @Override
     public void onBackPressed() {
@@ -324,6 +360,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
      * 连接或者断开连接的处理方法
      */
     private void connectToPeer(int num) {
+        if (num<1) return;
         final WifiP2pDevice device = peers.get(num-1);
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.deviceAddress;
