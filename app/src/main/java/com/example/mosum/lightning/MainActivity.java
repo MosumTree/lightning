@@ -205,9 +205,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         MediaBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
-                startActivityForResult(intent,20);
+                Intent intent = new Intent(MainActivity.this,Media.class);
+                startActivity(intent);
             }
         });
         //断开连接测试

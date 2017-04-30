@@ -36,6 +36,10 @@
         <activity android:name=".About">
 
         </activity>
+        <activity android:name=".Media">
+
+        </activity>
+
         <service android:name="connect.FileTransferService"
             android:enabled="true"/>
     </application>
