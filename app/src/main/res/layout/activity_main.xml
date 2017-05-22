@@ -96,16 +96,6 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/netlist_bt"
             android:layout_toEndOf="@+id/netlist_bt" />
-
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/stop_bt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:text="stop"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/filelist_bt"
-                android:layout_toEndOf="@+id/filelist_bt" />
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -147,10 +137,16 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@+id/connect_user_container"
             android:id="@+id/content_3"
             android:layout_below="@+id/content_2"
             android:background="#ffffff">
+            <ListView
+                android:id="@+id/history_listview_main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
+            </ListView>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -159,7 +155,8 @@
             android:id="@+id/connect_user_container"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentStart="true"
+            >
             <TextView
                 android:id="@+id/connect_user_title"
                 android:layout_width="wrap_content"

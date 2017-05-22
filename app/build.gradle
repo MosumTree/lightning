@@ -29,4 +29,5 @@ dependencies {
     compile project(':library')
     compile project(':sweetsheet')
     compile project(':progressBar')
+    compile project(':loadingLibrary')
 }

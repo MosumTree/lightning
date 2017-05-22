@@ -60,21 +60,28 @@ public class TransferActivity extends Activity {
             TransferActivity.this.startService(serviceIntent);
         }
         else{
-            mServerTask = new FileServerAsyncTask(TransferActivity.this,transferProgress);
+            mServerTask = new FileServerAsyncTask(TransferActivity.this,transferProgress,transderAmount);
             mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
     }
+    //用于接受service端的成功广播
     class MyBroadCaseReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context arg0, Intent intent) {
-            int i = intent.getIntExtra("progress", 0);
-            transferProgress.setProgress(i);
+            int i = intent.getIntExtra("progress",0);
+
         }
     }
     @Override
     protected void onPause() {
         super.onPause();
+        //
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(myBroadCaseReceiver);
     }
 }

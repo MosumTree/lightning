@@ -1,8 +1,10 @@
 package com.example.mosum.lightning;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -14,6 +16,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +51,7 @@ import ui.RippleImageView;
 import ui.WaterWaveView;
 import static android.R.id.list;
 import static com.mingle.sweetsheet.R.id.rl;
+import static com.mingle.sweetsheet.R.id.useLogo;
 
 public class MainActivity extends FragmentActivity implements  WifiP2pManager.PeerListListener,WifiP2pManager.ConnectionInfoListener {
     private DrawerLayout drawerLayout;
@@ -55,16 +59,18 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private ListView leftlistView;
     private FragmentManager fm;
     private List<ContentModel> list;
+    private List<ContentModel> historylist;
     private ContentAdapter adapter;
-
+    private ContentAdapter historyAdapter;
     //主界面下部效果测试按钮
     private Button searchbt;
     private Button netlistbt;
     private Button filelistbt;
-    private Button stopbt;
     private Button transferbt;
     private Button MediaBtn;
     private Button disconnectBtn;
+    //主界面历史记录
+    private ListView historyListView;
     //主界面闪电按钮
     private RippleImageView rippleImageView;
     private Button ligntningBt;
@@ -95,6 +101,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         leftMenu = (ImageView) findViewById(R.id.leftmenu);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         leftlistView = (ListView) findViewById(R.id.left_listview);
+        historyListView = (ListView) findViewById(R.id.history_listview_main);
         rippleImageView=(RippleImageView)findViewById(R.id.rippleImageView);
         ligntningBt= (Button) findViewById(R.id.ligntning_btn);
         connectDevice = (TextView)findViewById(R.id.connect_user) ;
@@ -103,6 +110,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         initLeftmenu();
         adapter = new ContentAdapter(this, list);
         leftlistView.setAdapter(adapter);
+        //historyListView.setAdapter(adapter);
         leftMenu.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -111,8 +119,9 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
-
-
+        historylist=readHistory();
+        historyAdapter = new ContentAdapter(this,historylist);
+        historyListView.setAdapter(historyAdapter);
 
 
         ligntningBt.setOnClickListener(new View.OnClickListener() {
@@ -129,7 +138,6 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                             public void onSuccess() {
                                 Log.d(MainActivity.this.getClass().getName(),
                                         "检测P2P进程成功");
-                                System.out.println("discover");
 
                             }
 
@@ -137,7 +145,6 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                             public void onFailure(int reason) {
                                 Log.d(MainActivity.this.getClass().getName(),
                                         "检测P2P进程失败");
-                                System.out.println("undiscover");
                             }
                         });
                 }
@@ -182,20 +189,21 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
         filelistbt.setVisibility(View.VISIBLE);
-        //停止主界面按钮波纹效果
+        /*//停止主界面按钮波纹效果测试按钮
         stopbt = (Button) findViewById(R.id.stop_bt);
         stopbt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rippleImageView.stopWaveAnimation();
             }
-        });
-        //打开文件互传界面
+        });*/
+        //打开文件互传界面测试按钮
         transferbt = (Button) findViewById(R.id.transfer_bt);
         transferbt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, TransferActivity.class);
+                intent.putExtra("isSend",false);
                 startActivity(intent);
             }
         });
@@ -234,14 +242,15 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                         startActivity(intent2);
                         break;
                     case 3:
-
+                        Intent intent3=new Intent(MainActivity.this,History.class);
+                        startActivity(intent3);
                         break;
                     case 4:
-
+                        System.exit(0);
                         break;
                     case 5:
-                        Intent intent6=new Intent(MainActivity.this,About.class);
-                        startActivity(intent6);
+                        Intent intent5=new Intent(MainActivity.this,About.class);
+                        startActivity(intent5);
                         break;
                     default:
                         break;
@@ -281,7 +290,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         list.add(new ContentModel(R.drawable.left_nearby, "nearby", 1));
         list.add(new ContentModel(R.drawable.left_dev, "device", 2));
         list.add(new ContentModel(R.drawable.left_history, "history", 3));
-        list.add(new ContentModel(R.drawable.left_setting, "setting", 4));
+        list.add(new ContentModel(R.drawable.left_exit, "exit", 4));
         list.add(new ContentModel(R.drawable.left_about, "about", 5));
     }
 
@@ -328,8 +337,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
 
     }
 
-    //重写后退键
-    @Override
+    //重写后退键(按后退键会报错，先注释标记一下)
+   /* @Override
     public void onBackPressed() {
         if (mSweetSheet.isShow()) {
             if (mSweetSheet.isShow()) {
@@ -338,7 +347,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         } else {
             super.onBackPressed();
         }
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -414,9 +423,23 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             /*mServerTask = new FileServerAsyncTask(MainActivity.this);
             mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             filelistbt.setVisibility(View.GONE);*/
-            Intent intent=new Intent(MainActivity.this,TransferActivity.class);
-            intent.putExtra("isSend",false);
-            MainActivity.this.startActivity(intent);
+            AlertDialog.Builder dialog =new AlertDialog.Builder(MainActivity.this);
+            dialog.setTitle("File transfer ask");
+            dialog.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent=new Intent(MainActivity.this,TransferActivity.class);
+                    intent.putExtra("isSend",false);
+                    MainActivity.this.startActivity(intent);
+                }
+            });
+            dialog.setNegativeButton("refuse", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            dialog.show();
         } else if (info.groupFormed) {
             //SetButtonVisible();
             Log.i("xyz","client start");
@@ -460,6 +483,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             for(WifiP2pDevice device: peers){
                 peersname[i++]=device.deviceName;
             }
+            //设置网络列表
             setupRecyclerView();
         }
 
@@ -470,14 +494,60 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         if (requestCode == 20) {
             super.onActivityResult(requestCode, resultCode, data);
             Uri uri = data.getData();//获取文件所在位置
-
+            int type=1;
+            String mimeType = getContentResolver().getType(uri);
+            //image/jpeg
             Intent transferIntent = new Intent(MainActivity.this,
                     TransferActivity.class);
             transferIntent.putExtra("isSend",true);
             transferIntent.putExtra("url",uri.toString());
-            transferIntent.putExtra("type",1);
+            Log.i("xyz", "mimeType is"+mimeType);
+            switch (mimeType){
+                case "video/mp4":
+                    type=2;
+                    break;
+                case "image/jpeg":
+                    type=1;
+                    break;
+
+            }
+            transferIntent.putExtra("type",type);
+
             transferIntent.putExtra("IP",info.groupOwnerAddress.getHostAddress());
             MainActivity.this.startActivity(transferIntent);
         }
+    }
+    List<ContentModel> readHistory(){
+        List<ContentModel> list= new ArrayList<ContentModel>();
+        SharedPreferences SAVE = getSharedPreferences("save", MODE_PRIVATE);
+        int point=SAVE.getInt("point", 0);
+        String type;
+        String filename;
+        final int N=16;
+        for(int i=0,n=point;i<=N;i++){
+            type=SAVE.getString("type"+n, null);
+            filename= SAVE.getString("filename"+n,null);
+            if(type!=null){
+                switch (type){
+                    case "jpg":
+                        Log.i("history", "jpg");
+                        list.add(new ContentModel(R.drawable.type_jpg,filename+n,i+1));
+                        break;
+                    case "mp4":
+                        Log.i("history", "mp4");
+                        list.add(new ContentModel(R.drawable.type_mp4,filename+n,i+1));
+                        break;
+                    case "mp3":
+                        list.add(new ContentModel(R.drawable.type_mp3,filename+n,i+1));
+                        break;
+                    case "txt":
+                        list.add(new ContentModel(R.drawable.type_txt,filename+n,i+1));
+                        break;
+                }
+
+            }
+            n=n>0?(--n):(--n+N)%16;
+        }
+        return list;
     }
 }

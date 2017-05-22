@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class FileTransferService extends IntentService{
     public static final String EXTRAS_FILE_TYPE = "sf_file_type";
 
     private OutputStream mOutputStream;
+    private Context context;
     /**
      * 传送文件的信息
      */
@@ -65,6 +67,14 @@ public class FileTransferService extends IntentService{
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
             mFileInfo.setFilePath(fileUri);
             mFileInfo.setFileType(type);
+            switch (type){
+                case 1:
+                    writeHistory(System.currentTimeMillis()+"","jpg");
+                    break;
+                case 2:
+                    writeHistory(System.currentTimeMillis()+"","mp4");
+                    break;
+            }
             Log.i("xyz", "port is:"+port);
             try {
                 Log.d("xyz", "Opening client socket - ");
@@ -127,12 +137,14 @@ public class FileTransferService extends IntentService{
                 eTime = System.currentTimeMillis();
                 if(eTime - sTime > 100) { //大于500ms 才进行一次监听
                     sTime = eTime;
-                    Intent intent = new Intent("send progress");
-                    intent.putExtra("progress", (transferlength * 100/ fileLength));
-                    sendBroadcast(intent);
+
                     System.out.println("文件发送了" +  (transferlength * 100/ fileLength) + "%\n");
+
                 }
-                //
+                if ((transferlength * 100/ fileLength)==100){
+                Intent intent = new Intent("send progress");
+                intent.putExtra("progress", 100);
+                sendBroadcast(intent);}
                 //
                 out.write(buf, 0, len);
 
@@ -163,13 +175,16 @@ public class FileTransferService extends IntentService{
         //写入header
         mOutputStream.write(headbytes);
     }
-    /**
-     * 文件传送的监听
-     */
-    public interface OnSendListener{
-        void onStart();
-        void onProgress(long progress, long total);
-        void onSuccess(FileInfo fileInfo);
-        void onFailure(Throwable t, FileInfo fileInfo);
+    //历史记录存储
+
+    void writeHistory(String filename,String type){
+        SharedPreferences SAVE = context.getSharedPreferences("save", MODE_PRIVATE);
+        int n=SAVE.getInt("point", 0);
+        SharedPreferences.Editor editor = SAVE.edit();
+        editor.putString("filename"+n,filename);
+        editor.putString("type"+n, type);
+        editor.putInt("point",(n+1)%16);
+        editor.commit();
     }
+
 }

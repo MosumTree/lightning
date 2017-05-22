@@ -2,6 +2,7 @@ package connect;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -18,10 +19,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import utils.FileInfo;
 
+import static android.content.Context.MODE_PRIVATE;
 import static transfer.BaseTransfer.BYTE_SIZE_HEADER;
 import static transfer.BaseTransfer.SPERATOR;
 import static transfer.BaseTransfer.UTF_8;
@@ -35,23 +39,21 @@ public class FileServerAsyncTask extends
 
     private Context context;
     private MaterialProgressBar mmaterialProgressBar;
+    private TextView mtransferAmount;
     private FileInfo mFileInfo;
     private static int progress=0;
-    /**
-     * 文件接收的监听
-     */
-    OnReceiveListener mOnReceiveListener;
+
+
     /**
      * @param context
      */
-    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar) {
+    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar,TextView mtransferAmount) {
         this.context = context;
         this.mmaterialProgressBar=materialProgressBar;
+        this.mtransferAmount=mtransferAmount;
 
     }
-    public void setOnReceiveListener(OnReceiveListener mOnReceiveListener) {
-        this.mOnReceiveListener = mOnReceiveListener;
-    }
+
     /**
      * 这里的Integer参数对应AsyncTask中的第一个参数
      * 这里的String返回值对应AsyncTask的第三个参数
@@ -67,10 +69,45 @@ public class FileServerAsyncTask extends
             Log.i("xyz", "服务器监听端口创建完毕");
             Socket client = serverSocket.accept();//从连接队列中取出一个连接，如果没有则等待
             Log.i("xyz", "创建客户端socket完毕");
-            final File f = new File(
+
+
+            File f = new File(
                     Environment.getExternalStorageDirectory() + "/"
-                            + "com.miko.zd" + "/wifip2pshared-"
-                            + System.currentTimeMillis() + ".jpg");
+                            + "com.ligntning" + "/wifip2pshared-"
+                            + System.currentTimeMillis() + ".jpg");;
+            /*Returns an input stream to read data from this socket*/
+            InputStream inputstream = client.getInputStream();
+            parseHeader(inputstream);
+            switch (mFileInfo.getFileType()){
+                case 1:
+                    f = new File(
+                            Environment.getExternalStorageDirectory() + "/"
+                                    + "com.ligntning" + "/wifip2pshared-"
+                                    + System.currentTimeMillis() + ".jpg");
+                    writeHistory(System.currentTimeMillis()+"","jpg");
+                    break;
+                case 2:
+                    f = new File(
+                            Environment.getExternalStorageDirectory() + "/"
+                                    + "com.ligntning" + "/wifip2pshared-"
+                                    + System.currentTimeMillis() + ".mp4");
+                    writeHistory(System.currentTimeMillis()+"","mp4");
+                    break;
+                case 3:
+                    f = new File(
+                            Environment.getExternalStorageDirectory() + "/"
+                                    + "com.ligntning" + "/wifip2pshared-"
+                                    + System.currentTimeMillis() + ".txt");
+                    break;
+                case 4:
+                    f = new File(
+                            Environment.getExternalStorageDirectory() + "/"
+                                    + "com.ligntning" + "/wifip2pshared-"
+                                    + System.currentTimeMillis() + ".mp3");
+                    break;
+
+            }
+
 
             File dirs = new File(f.getParent());
 
@@ -78,10 +115,6 @@ public class FileServerAsyncTask extends
                 dirs.mkdirs();
             f.createNewFile();
 
-
-            /*Returns an input stream to read data from this socket*/
-            InputStream inputstream = client.getInputStream();
-            parseHeader(inputstream);
             Log.i("xyz", "文件的路径："+mFileInfo.getFilePath()+"文件的类型："+mFileInfo.getFileType()+"文件的大小："+mFileInfo.getSize()/1024+"kb");
             copyFile(inputstream, new FileOutputStream(f),mFileInfo);
 
@@ -98,6 +131,7 @@ public class FileServerAsyncTask extends
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         mmaterialProgressBar.setProgress(values[0]);
+        mtransferAmount.setText(mFileInfo.getSize()*values[0]/102400+"KB");
         Log.i("progress", ""+values[0]);
     }
 
@@ -144,7 +178,8 @@ public class FileServerAsyncTask extends
             while ((len = inputStream.read(buf)) != -1) {
                 transferlength+=len;
                 eTime = System.currentTimeMillis();
-                if(eTime - sTime > 100) { //大于500ms 才进行一次监听
+
+                if(eTime - sTime > 50) { //大于50ms 才进行一次监听
                     sTime = eTime;
                     progress= (int) (transferlength * 100/fileLength);
                     publishProgress(progress);
@@ -189,14 +224,16 @@ public class FileServerAsyncTask extends
         jsonStr = strArray[1].trim();
         mFileInfo = FileInfo.toObject(jsonStr);
     }
-    /**
-     * 文件接收的监听
-     */
-    public interface OnReceiveListener{
-        void onStart();
-        //void onGetFileInfo(FileInfo fileInfo);
-        void onProgress(long progress, long total);
-        void onSuccess(FileInfo fileInfo);
-        void onFailure(Throwable t, FileInfo fileInfo);
+
+    //历史记录存储
+
+    void writeHistory(String filename,String type){
+        SharedPreferences SAVE = context.getSharedPreferences("save", MODE_PRIVATE);
+        int n=SAVE.getInt("point", 0);
+        SharedPreferences.Editor editor = SAVE.edit();
+        editor.putString("filename"+n,filename);
+        editor.putString("type"+n, type);
+        editor.putInt("point",(n+1)%16);
+        editor.commit();
     }
 }

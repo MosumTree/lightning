@@ -39,7 +39,9 @@
         <activity android:name=".Media">
 
         </activity>
+        <activity android:name=".History">
 
+        </activity>
         <service android:name="connect.FileTransferService"
             android:enabled="true"/>
     </application>
