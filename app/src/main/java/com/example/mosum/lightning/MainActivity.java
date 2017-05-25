@@ -39,11 +39,18 @@ import com.mingle.sweetpick.BlurEffect;
 import com.mingle.sweetpick.RecyclerViewDelegate;
 import com.mingle.sweetpick.SweetSheet;
 
+import java.io.IOException;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import connect.FileServerAsyncTask;
 import connect.FileTransferService;
+import connect.SimpleServer;
 import connect.WifiP2PReceiver;
 import ui.ContentAdapter;
 import ui.ContentModel;
@@ -94,6 +101,9 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private TextView connectDeviceTitle;
     //文件传输
     private FileServerAsyncTask mServerTask;
+
+    //自建服务器
+    private SimpleServer server;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +132,23 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         historylist=readHistory();
         historyAdapter = new ContentAdapter(this,historylist);
         historyListView.setAdapter(historyAdapter);
+
+
+        //开启服务器
+        server = new SimpleServer();
+        try {
+
+            // 因为程序模拟的是html放置在asset目录下，
+            // 所以在这里存储一下AssetManager的指针。
+            server.asset_mgr = this.getAssets();
+
+            // 启动web服务
+            server.start();
+
+            Log.i("Httpd", "The server started."+getHostIP());
+        } catch(IOException ioe) {
+            Log.w("Httpd", "The server could not start."+ioe);
+        }
 
 
         ligntningBt.setOnClickListener(new View.OnClickListener() {
@@ -282,8 +309,57 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     }
 
 
+    //获取本机IP地址
+    public static String getHostIP() {
 
+        String hostIp = null;
+        try {
+            Enumeration nis = NetworkInterface.getNetworkInterfaces();
+            InetAddress ia = null;
+            while (nis.hasMoreElements()) {
+                NetworkInterface ni = (NetworkInterface) nis.nextElement();
+                Enumeration<InetAddress> ias = ni.getInetAddresses();
+                while (ias.hasMoreElements()) {
+                    ia = ias.nextElement();
+                    if (ia instanceof Inet6Address) {
+                        continue;// skip ipv6
+                    }
+                    String ip = ia.getHostAddress();
+                    if (!"127.0.0.1".equals(ip)) {
+                        hostIp = ia.getHostAddress();
+                        break;
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            Log.i("yao", "SocketException");
+            e.printStackTrace();
+        }
+        return hostIp;
 
+    }
+    /*public String getLocalIpAddress() {
+        try {
+            // 遍历网络接口
+            Enumeration<NetworkInterface> infos = NetworkInterface.getNetworkInterfaces();
+            while (infos.hasMoreElements()) {
+                // 获取网络接口
+                NetworkInterface niFace = infos.nextElement();
+                Enumeration<InetAddress> enumIpAddr = niFace.getInetAddresses();
+                while (enumIpAddr.hasMoreElements()) {
+                    InetAddress mInetAddress = enumIpAddr.nextElement();
+                    // 所获取的网络地址不是127.0.0.1时返回得得到的IP
+                    if (!mInetAddress.isLoopbackAddress()&& InetAddressUtils.isIPv4Address(mInetAddress
+                            .getHostAddress())) {
+                        return mInetAddress.getHostAddress().toString();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }*/
     //初始化侧边栏菜单
     private void initLeftmenu() {
         list = new ArrayList<ContentModel>();
@@ -362,7 +438,17 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         unregisterReceiver(wifiP2PReceiver);
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
 
+        if (server != null){
+            // 在程序退出时关闭web服务器
+            server.stop();
+        }
+        Log.w("Httpd", "The server stopped.");
+    }
 
     /**
      * 连接或者断开连接的处理方法
@@ -514,6 +600,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             transferIntent.putExtra("type",type);
 
             transferIntent.putExtra("IP",info.groupOwnerAddress.getHostAddress());
+            Log.i("lalalalallalala",info.groupOwnerAddress.getHostAddress());
             MainActivity.this.startActivity(transferIntent);
         }
     }

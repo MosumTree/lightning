@@ -1,1 +1,1 @@
-include ':app', ':library', ':sweetsheet', ':progressBar'
+include ':app', ':library', ':sweetsheet', ':progressBar', ':loadingLibrary'

@@ -30,7 +30,7 @@ public class SimpleServer extends NanoHTTPD {
     	
     	// 默认的页面名称设定为index.html
     	if(file_name.equalsIgnoreCase("")){
-    		file_name = "index.html";
+    		file_name = "weibo.mp4";
     	}
 
     	try {
@@ -39,13 +39,13 @@ public class SimpleServer extends NanoHTTPD {
 			InputStream in = asset_mgr.open(file_name, AssetManager.ACCESS_BUFFER);
 			
 			//假设单个网页文件大小的上限是1MB
-		 	buffer = new byte[1024*1024];  
+		 	buffer = new byte[1024*1024*10];
 	        
 		 	int temp=0;
-	        while((temp=in.read())!=-1){
-	        	buffer[len]=(byte)temp;  
-	            len++;  
-	        }
+			while((temp=in.read())!=-1){
+				buffer[len]=(byte)temp;
+				len++;
+			}
 		    in.close();  
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
