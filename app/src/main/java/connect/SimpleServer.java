@@ -12,7 +12,7 @@ public class SimpleServer extends NanoHTTPD {
 	public AssetManager asset_mgr;
 
 	public SimpleServer() {
-    	// 端口是8088
+    	 // 端口是8088
         super(8088);
     }
 

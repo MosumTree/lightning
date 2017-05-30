@@ -21,7 +21,7 @@ public class SplashActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.splash_layout);
         Handler x = new Handler();
-        x.postDelayed(new splashhandler(), 1000);
+        x.postDelayed(new splashhandler(), 2000);
 
     }
     class splashhandler implements Runnable{

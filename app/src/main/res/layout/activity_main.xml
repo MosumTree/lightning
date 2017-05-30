@@ -52,7 +52,10 @@
                 android:layout_height="match_parent"
                 app:show_spacing_time="700"
                 app:imageViewWidth="160dp"
-                app:imageViewHeigth="160dp">
+                app:imageViewHeigth="160dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true">
 
                 <Button
                     android:layout_width="150dp"
@@ -63,66 +66,90 @@
                     android:layout_centerHorizontal="true" />
             </ui.RippleImageView>
         </RelativeLayout>
-
-
-        <RelativeLayout
-            android:id="@+id/context"
+        <LinearLayout
+            android:id="@+id/item"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/main_context">
+            android:layout_height="250px"
+            android:layout_below="@+id/main_context"
+            android:weightSum="4"
+            android:background="@color/white"
+            android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/search_bt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:text="search" />
+            <ImageButton
+                android:id="@+id/filelist_ibtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10px"
+                android:layout_marginRight="10px"
+                android:background="@drawable/file_btn"/>
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/netlist_bt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/search_bt"
-                android:layout_margin="3dp"
-                android:text="netlist" />
-
-            <android.support.v7.widget.AppCompatButton
-            android:id="@+id/filelist_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:text="filelist"
-
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/netlist_bt"
-            android:layout_toEndOf="@+id/netlist_bt" />
-        </RelativeLayout>
-        <RelativeLayout
+            <ImageButton
+                android:id="@+id/netlist_ibtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10px"
+                android:layout_marginRight="10px"
+                android:background="@drawable/netlist_btn"/>
+            <ImageButton
+                android:id="@+id/transfer_ibtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10px"
+                android:layout_marginRight="10px"
+                android:background="@drawable/transfer_btn"/>
+            <ImageButton
+                android:id="@+id/disconnect_ibtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="10px"
+                android:layout_marginRight="10px"
+                android:background="@drawable/disconnect_btn"/>
+        </LinearLayout>
+        <!--<LinearLayout
+            android:id="@+id/item_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/content_2"
-            android:layout_below="@+id/context">
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/transfer_bt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:text="transfer" />
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/media"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/transfer_bt"
-                android:layout_margin="3dp"
-                android:text="media"/>
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/disconnect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/media"
-                android:layout_margin="3dp"
-                android:text="disconnect"/>
-        </RelativeLayout>
+            android:layout_height="70px"
+            android:layout_below="@+id/item"
+            android:weightSum="4"
+            android:background="@color/white"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="FILELIST"
+                android:gravity="center"
+                android:textSize="42px"
+                android:textColor="#000000"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="NETLIST"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:textSize="42px"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="TRANSFER"
+                android:gravity="center"
+                android:textColor="#000000"
+                android:textSize="42px"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="DISCON"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:textSize="42px"/>
+        </LinearLayout>-->
         <!--测试代码-->
         <!--<RelativeLayout
             android:layout_width="match_parent"
@@ -134,12 +161,27 @@
                 android:layout_height="wrap_content">
             </ListView>
         </RelativeLayout>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/line"
+            android:layout_height="100px"
+            android:layout_below="@id/item"
+            android:orientation="horizontal"
+            android:background="@color/colorPrimaryDark">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="HISTORY"
+                android:textColor="#fff"
+                android:layout_marginLeft="20px"/>
+        </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/connect_user_container"
             android:id="@+id/content_3"
-            android:layout_below="@+id/content_2"
+            android:layout_below="@+id/line"
             android:background="#ffffff">
             <ListView
                 android:id="@+id/history_listview_main"

@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -13,6 +14,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -27,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -75,7 +78,12 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private Button filelistbt;
     private Button transferbt;
     private Button MediaBtn;
-    private Button disconnectBtn;
+
+    private ImageButton filelistBtn;//查看已连接设备的文件本地文件
+    private ImageButton transferBtn;//进行文件传输
+    private ImageButton netlistBtn;//查看发现设备列表
+    private ImageButton disconnectBtn;//断开与当前设备的连接
+
     //主界面历史记录
     private ListView historyListView;
     //主界面闪电按钮
@@ -132,7 +140,17 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         historylist=readHistory();
         historyAdapter = new ContentAdapter(this,historylist);
         historyListView.setAdapter(historyAdapter);
-
+        //打开指定目录下的文件
+        historyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //intent.setDataAndType("/sdcard", "text/html");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                startActivityForResult(intent,20);
+            }
+        });
 
         //开启服务器
         server = new SimpleServer();
@@ -182,7 +200,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
 
-        //打开搜索界面
+        /*//打开搜索界面
         searchbt = (Button) findViewById(R.id.search_bt);
         searchbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,23 +208,25 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                 startActivity(intent);
             }
-        });
-
+        });*/
+        //打开连接设备的文件列表
 
         rl = (RelativeLayout) findViewById(R.id.fragment_layout);
 
+
         //打开搜索到的wifiP2P用户列表
-        netlistbt = (Button) findViewById(R.id.netlist_bt);
-        netlistbt.setOnClickListener(new View.OnClickListener() {
+        netlistBtn = (ImageButton) findViewById(R.id.netlist_ibtn);
+        netlistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupRecyclerView();
                 mSweetSheet.toggle();
             }
         });
+
         //打开本地文件
-        filelistbt = (Button) findViewById(R.id.filelist_bt);
-        filelistbt.setOnClickListener(new View.OnClickListener(){
+        transferBtn = (ImageButton) findViewById(R.id.transfer_ibtn);
+        transferBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -215,8 +235,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 startActivityForResult(intent,20);
             }
         });
-        filelistbt.setVisibility(View.VISIBLE);
-        /*//停止主界面按钮波纹效果测试按钮
+        transferBtn.setVisibility(View.VISIBLE);
+        /*停止主界面按钮波纹效果测试按钮
         stopbt = (Button) findViewById(R.id.stop_bt);
         stopbt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,18 +244,18 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 rippleImageView.stopWaveAnimation();
             }
         });*/
-        //打开文件互传界面测试按钮
-        transferbt = (Button) findViewById(R.id.transfer_bt);
-        transferbt.setOnClickListener(new View.OnClickListener() {
+        /*打开文件互传界面
+        filelistBtn = (ImageButton) findViewById(R.id.transfer_bt);
+        filelistBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, TransferActivity.class);
                 intent.putExtra("isSend",false);
                 startActivity(intent);
             }
-        });
+        });*/
 
-        //播放器测试
+        /*播放器测试
         MediaBtn =(Button)findViewById(R.id.media);
         MediaBtn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -243,9 +263,9 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                 Intent intent = new Intent(MainActivity.this,Media.class);
                 startActivity(intent);
             }
-        });
-        //断开连接测试
-        disconnectBtn=(Button)findViewById(R.id.disconnect);
+        });*/
+        //断开连接
+        disconnectBtn=(ImageButton)findViewById(R.id.disconnect_ibtn);
         disconnectBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -258,7 +278,6 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
                 switch ((int) id) {
                     case 1:
                         setupRecyclerView();
@@ -483,6 +502,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             }
         });
     }
+    //断开连接
     private void disconnect() {
 
         mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
@@ -529,7 +549,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         } else if (info.groupFormed) {
             //SetButtonVisible();
             Log.i("xyz","client start");
-            filelistbt.setVisibility(View.VISIBLE);
+            transferBtn.setVisibility(View.VISIBLE);
         }
     }
     //实现确定谁是GO
@@ -579,6 +599,8 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 20) {
             super.onActivityResult(requestCode, resultCode, data);
+            if (data==null)
+                return;
             Uri uri = data.getData();//获取文件所在位置
             int type=1;
             String mimeType = getContentResolver().getType(uri);
@@ -608,6 +630,10 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         List<ContentModel> list= new ArrayList<ContentModel>();
         SharedPreferences SAVE = getSharedPreferences("save", MODE_PRIVATE);
         int point=SAVE.getInt("point", 0);
+        if (point==0){
+            list.add(new ContentModel(R.drawable.left_history,"无历史记录",1));
+            return list;
+        }
         String type;
         String filename;
         final int N=16;

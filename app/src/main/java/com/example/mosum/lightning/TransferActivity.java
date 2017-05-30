@@ -31,6 +31,7 @@ public class TransferActivity extends Activity {
 
     //广播，用于更新UI
     MyBroadCaseReceiver myBroadCaseReceiver;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

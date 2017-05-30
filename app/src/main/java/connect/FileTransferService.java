@@ -67,14 +67,14 @@ public class FileTransferService extends IntentService{
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
             mFileInfo.setFilePath(fileUri);
             mFileInfo.setFileType(type);
-            switch (type){
+            /*switch (type){
                 case 1:
                     writeHistory(System.currentTimeMillis()+"","jpg");
                     break;
                 case 2:
                     writeHistory(System.currentTimeMillis()+"","mp4");
                     break;
-            }
+            }*/
             Log.i("xyz", "port is:"+port);
             try {
                 Log.d("xyz", "Opening client socket - ");
