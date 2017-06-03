@@ -16,7 +16,8 @@ import com.example.mosum.lightning.R;
  * Created by mosum on 2017/2/8.
  * 侧边栏内容适配器
  */
-public class ContentAdapter extends BaseAdapter {
+public class
+ContentAdapter extends BaseAdapter {
 
 	private Context context;
 	private List<ContentModel> list;

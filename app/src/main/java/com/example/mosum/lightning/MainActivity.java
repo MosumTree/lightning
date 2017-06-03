@@ -1,10 +1,12 @@
 package com.example.mosum.lightning;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.Image;
 import android.net.Uri;
 import android.net.wifi.WpsInfo;
@@ -15,6 +17,7 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
@@ -59,6 +62,8 @@ import ui.ContentAdapter;
 import ui.ContentModel;
 import ui.RippleImageView;
 import ui.WaterWaveView;
+
+import static android.R.attr.data;
 import static android.R.id.list;
 import static com.mingle.sweetsheet.R.id.rl;
 import static com.mingle.sweetsheet.R.id.useLogo;
@@ -75,7 +80,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     //主界面下部效果测试按钮
     private Button searchbt;
     private Button netlistbt;
-    private Button filelistbt;
+    //private Button filelistbt;
     private Button transferbt;
     private Button MediaBtn;
 
@@ -146,9 +151,9 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //intent.setDataAndType("/sdcard", "text/html");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+                intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                startActivityForResult(intent,20);
+                startActivity(intent);
             }
         });
 
@@ -212,8 +217,15 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         //打开连接设备的文件列表
 
         rl = (RelativeLayout) findViewById(R.id.fragment_layout);
-
-
+        //打开文件列表
+        filelistBtn=(ImageButton) findViewById(R.id.filelist_ibtn);
+        filelistBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Media.class);
+                startActivity(intent);
+            }
+        });
         //打开搜索到的wifiP2P用户列表
         netlistBtn = (ImageButton) findViewById(R.id.netlist_ibtn);
         netlistBtn.setOnClickListener(new View.OnClickListener() {
@@ -602,14 +614,19 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             if (data==null)
                 return;
             Uri uri = data.getData();//获取文件所在位置
+            String uriname=uri.toString();
+            if(uriname==null) uriname="unknown";
+            Log.i("path",uriname);
             int type=1;
             String mimeType = getContentResolver().getType(uri);
             //image/jpeg
             Intent transferIntent = new Intent(MainActivity.this,
                     TransferActivity.class);
             transferIntent.putExtra("isSend",true);
-            transferIntent.putExtra("url",uri.toString());
+            transferIntent.putExtra("uri",uri.toString());
             Log.i("xyz", "mimeType is"+mimeType);
+            if (mimeType==null)type=1;
+            else{
             switch (mimeType){
                 case "video/mp4":
                     type=2;
@@ -618,7 +635,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
                     type=1;
                     break;
 
-            }
+            }}
             transferIntent.putExtra("type",type);
 
             transferIntent.putExtra("IP",info.groupOwnerAddress.getHostAddress());
@@ -626,6 +643,46 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             MainActivity.this.startActivity(transferIntent);
         }
     }
+    //获取路径中的文件名
+    public String getFileName(String pathandname){
+
+        int start=pathandname.lastIndexOf("/");
+        int end=pathandname.lastIndexOf(".");
+        if(start!=-1 && end!=-1){
+            if(pathandname.substring(start+1,end)==null)
+                end=pathandname.lastIndexOf(":");
+            return pathandname.substring(start+1,end);
+        }else{
+            return null;
+        }
+
+    }
+    //根据uri获取路径名
+    public static String getRealFilePath( final Context context, final Uri uri ) {
+        if ( null == uri ) return null;
+        final String scheme = uri.getScheme();
+        String data = null;
+        //file:///storage/emulated/0/com.ligntning/lalala.mp4
+        if ( scheme == null )
+            data = uri.getPath();
+        else if ( ContentResolver.SCHEME_FILE.equals( scheme ) ) {
+            data = uri.getPath();
+        } else if ( ContentResolver.SCHEME_CONTENT.equals( scheme ) ) {
+            Cursor cursor = context.getContentResolver().query( uri, new String[] { MediaStore.Images.ImageColumns.DATA }, null, null, null );
+            if ( null != cursor ) {
+                if ( cursor.moveToFirst() ) {
+                    int index = cursor.getColumnIndex( MediaStore.Images.ImageColumns.DATA );
+                    if ( index > -1 ) {
+                        data = cursor.getString( index );
+                    }
+                }
+                cursor.close();
+            }
+        }
+        if (data==null){return "unknown";}
+        return data;
+    }
+    //读历史记录
     List<ContentModel> readHistory(){
         List<ContentModel> list= new ArrayList<ContentModel>();
         SharedPreferences SAVE = getSharedPreferences("save", MODE_PRIVATE);

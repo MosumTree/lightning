@@ -4,12 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.mosum.lightning.R;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -23,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
+import ui.ContentAdapter;
+import ui.ContentModel;
 import utils.FileInfo;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -40,18 +47,21 @@ public class FileServerAsyncTask extends
     private Context context;
     private MaterialProgressBar mmaterialProgressBar;
     private TextView mtransferAmount;
+    private ListView mcurrentTransfer;
+    private ContentAdapter currentAdapter;
     private FileInfo mFileInfo;
+
     private static int progress=0;
 
 
     /**
      * @param context
      */
-    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar,TextView mtransferAmount) {
+    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar,TextView mtransferAmount,ListView mcurrentTransfer) {
         this.context = context;
         this.mmaterialProgressBar=materialProgressBar;
         this.mtransferAmount=mtransferAmount;
-
+        this.mcurrentTransfer=mcurrentTransfer;
     }
 
     /**
@@ -162,6 +172,10 @@ public class FileServerAsyncTask extends
      */
     @Override
     protected void onPreExecute() {
+        List<ContentModel> currentlist=new ArrayList();
+        currentlist.add(new ContentModel(R.drawable.left_history, "   wifip2psharedFile", 1));
+        currentAdapter=new ContentAdapter(this.context,currentlist);
+        mcurrentTransfer.setAdapter(currentAdapter);
 
     }
 
