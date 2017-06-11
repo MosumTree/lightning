@@ -79,7 +79,7 @@ public class TransferActivity extends Activity {
             TransferActivity.this.startService(serviceIntent);
         }
         else{
-            mServerTask = new FileServerAsyncTask(TransferActivity.this,transferProgress,transferAmount,currentTransferr);
+            mServerTask = new FileServerAsyncTask(TransferActivity.this,transferProgress,transferAmount,currentTransferr,transferSpeed);
             mServerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 

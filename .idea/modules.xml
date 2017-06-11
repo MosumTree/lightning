@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/loadingLibrary/loadingLibrary.iml" filepath="$PROJECT_DIR$/loadingLibrary/loadingLibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/progressBar/progressBar.iml" filepath="$PROJECT_DIR$/progressBar/progressBar.iml" />
       <module fileurl="file://$PROJECT_DIR$/sweetsheet/sweetsheet.iml" filepath="$PROJECT_DIR$/sweetsheet/sweetsheet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vitamio/vitamio.iml" filepath="$PROJECT_DIR$/vitamio/vitamio.iml" />
     </modules>
   </component>
 </project>

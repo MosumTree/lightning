@@ -36,10 +36,29 @@
         <activity android:name=".About">
 
         </activity>
-        <activity android:name=".Media">
-
+        <activity
+            android:name=".Media"
+            android:screenOrientation="landscape">
         </activity>
         <activity android:name=".History">
+
+        </activity>
+        <!--必须初始化-->
+        <activity
+
+            android:name="io.vov.vitamio.activity.InitActivity"
+
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+
+            android:launchMode="singleTop"
+
+            android:theme="@android:style/Theme.NoTitleBar"
+
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name=".vitamioVideoView"
+            android:screenOrientation="landscape"
+            android:process=":vitamio">
 
         </activity>
         <service android:name="connect.FileTransferService"

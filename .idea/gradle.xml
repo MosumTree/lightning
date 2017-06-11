@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/loadingLibrary" />
             <option value="$PROJECT_DIR$/progressBar" />
             <option value="$PROJECT_DIR$/sweetsheet" />
+            <option value="$PROJECT_DIR$/vitamio" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

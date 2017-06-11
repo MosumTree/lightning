@@ -16,6 +16,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
@@ -45,6 +46,7 @@ import com.mingle.sweetpick.BlurEffect;
 import com.mingle.sweetpick.RecyclerViewDelegate;
 import com.mingle.sweetpick.SweetSheet;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -114,7 +116,7 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
     private TextView connectDeviceTitle;
     //文件传输
     private FileServerAsyncTask mServerTask;
-
+    private String FilePath = Environment.getExternalStorageDirectory() + "/com.ligntningTransfer/";
     //自建服务器
     private SimpleServer server;
     @Override
@@ -131,6 +133,15 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         connectDevice.setVisibility(View.GONE);
         fm = getSupportFragmentManager();
         initLeftmenu();
+        /**
+         * 如果不存在该文件夹，在应用启动时就创建该文件夹，如果存在当然不会创建
+         * 然后获取该文件下的所有文件
+         * */
+
+        makeRootDirectory(FilePath);
+
+
+
         adapter = new ContentAdapter(this, list);
         leftlistView.setAdapter(adapter);
         //historyListView.setAdapter(adapter);
@@ -531,6 +542,11 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         });
     }
     //连接设备后会触发
+    /**
+    * 要实现设备连接后把指定文件夹里的所有文件都传输给设备另一端，就需要去除transferbt的选择过程，
+    * 所以采用以下逻辑，两设备连接，接收方仍然选择accept是进入传输界面，
+     * 发送方省去选择传输文件的逻辑，直接定死传输路径，即连接后就传输。
+    * */
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo minfo) {
         Log.i("xyz", "InfoAvailable is on");
@@ -562,6 +578,26 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             //SetButtonVisible();
             Log.i("xyz","client start");
             transferBtn.setVisibility(View.VISIBLE);
+            File f = new File(FilePath);
+            File[] files = f.listFiles();// 列出所有文件
+            for (int i=0;i<files.length;i++){
+                Log.i("filename"+i+":",files[i].getName());
+                Intent serviceIntent = new Intent(MainActivity.this,
+                        FileTransferService.class);
+                serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+                serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH,
+                        FilePath+files[i].getName());//将位置传入Service
+
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                        info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
+                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
+                        8981);//传入端口port
+                serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_TYPE,
+                        getType(files[i].getName()));//传入文件类型
+                MainActivity.this.startService(serviceIntent);
+            }
+
+
         }
     }
     //实现确定谁是GO
@@ -639,7 +675,6 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             transferIntent.putExtra("type",type);
 
             transferIntent.putExtra("IP",info.groupOwnerAddress.getHostAddress());
-            Log.i("lalalalallalala",info.groupOwnerAddress.getHostAddress());
             MainActivity.this.startActivity(transferIntent);
         }
     }
@@ -657,6 +692,16 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         }
 
     }
+    //获取文件后缀名转成类型
+    public  int getType(String fileName){
+        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        if (suffix=="jpg")
+            return 1;
+        else if (suffix=="mp4")
+            return  2;
+        return 1;
+    }
+
     //根据uri获取路径名
     public static String getRealFilePath( final Context context, final Uri uri ) {
         if ( null == uri ) return null;
@@ -719,5 +764,17 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
             n=n>0?(--n):(--n+N)%16;
         }
         return list;
+    }
+    // 生成文件夹
+    public static void makeRootDirectory(String filePath) {
+        File file = null;
+        try {
+            file = new File(filePath);
+            if (!file.exists()) {
+                file.mkdir();
+            }
+        } catch (Exception e) {
+            Log.i("error:", e+"");
+        }
     }
 }

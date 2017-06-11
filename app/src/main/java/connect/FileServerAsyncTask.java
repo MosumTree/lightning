@@ -47,6 +47,7 @@ public class FileServerAsyncTask extends
     private Context context;
     private MaterialProgressBar mmaterialProgressBar;
     private TextView mtransferAmount;
+    private TextView mtransferSpeed;
     private ListView mcurrentTransfer;
     private ContentAdapter currentAdapter;
     private FileInfo mFileInfo;
@@ -57,11 +58,12 @@ public class FileServerAsyncTask extends
     /**
      * @param context
      */
-    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar,TextView mtransferAmount,ListView mcurrentTransfer) {
+    public FileServerAsyncTask(Context context, MaterialProgressBar materialProgressBar,TextView mtransferAmount,ListView mcurrentTransfer,TextView mtransferSpeed) {
         this.context = context;
         this.mmaterialProgressBar=materialProgressBar;
         this.mtransferAmount=mtransferAmount;
         this.mcurrentTransfer=mcurrentTransfer;
+        this.mtransferSpeed=mtransferSpeed;
     }
 
     /**
@@ -142,6 +144,7 @@ public class FileServerAsyncTask extends
         super.onProgressUpdate(values);
         mmaterialProgressBar.setProgress(values[0]);
         mtransferAmount.setText(mFileInfo.getSize()*values[0]/102400+"KB");
+        mtransferSpeed.setText("5MB/s");
         Log.i("progress", ""+values[0]);
     }
 
