@@ -577,25 +577,40 @@ public class MainActivity extends FragmentActivity implements  WifiP2pManager.Pe
         } else if (info.groupFormed) {
             //SetButtonVisible();
             Log.i("xyz","client start");
+            AlertDialog.Builder dialog =new AlertDialog.Builder(MainActivity.this);
             transferBtn.setVisibility(View.VISIBLE);
-            File f = new File(FilePath);
-            File[] files = f.listFiles();// 列出所有文件
-            for (int i=0;i<files.length;i++){
-                Log.i("filename"+i+":",files[i].getName());
-                Intent serviceIntent = new Intent(MainActivity.this,
-                        FileTransferService.class);
-                serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-                serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH,
-                        FilePath+files[i].getName());//将位置传入Service
+            dialog.setTitle("File send ask");
+            dialog.setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    File f = new File(FilePath);
+                    File[] files = f.listFiles();// 列出所有文件
+                    for (int i=0;i<files.length;i++){
+                        Log.i("filename"+i+":",files[i].getName());
+                        Intent serviceIntent = new Intent(MainActivity.this,
+                                FileTransferService.class);
+                        serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+                        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_PATH,
+                                FilePath+files[i].getName());//将位置传入Service
 
-                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
-                        info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
-                serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
-                        8981);//传入端口port
-                serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_TYPE,
-                        getType(files[i].getName()));//传入文件类型
-                MainActivity.this.startService(serviceIntent);
-            }
+                        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,
+                                info.groupOwnerAddress.getHostAddress());//传入组长IP，用于创建socket端口
+                        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT,
+                                8981);//传入端口port
+                        serviceIntent.putExtra(FileTransferService.EXTRAS_FILE_TYPE,
+                                getType(files[i].getName()));//传入文件类型
+                        MainActivity.this.startService(serviceIntent);
+                    }
+                }
+            });
+            dialog.setNegativeButton("refuse", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            dialog.show();
+
 
 
         }

@@ -86,10 +86,12 @@ public class FileServerAsyncTask extends
             File f = new File(
                     Environment.getExternalStorageDirectory() + "/"
                             + "com.ligntning" + "/wifip2pshared-"
-                            + System.currentTimeMillis() + ".jpg");;
+                            + System.currentTimeMillis() + ".jpg");
+
             /*Returns an input stream to read data from this socket*/
             InputStream inputstream = client.getInputStream();
             parseHeader(inputstream);
+
             switch (mFileInfo.getFileType()){
                 case 1:
                     f = new File(
@@ -126,7 +128,7 @@ public class FileServerAsyncTask extends
             if (!dirs.exists())
                 dirs.mkdirs();
             f.createNewFile();
-
+            Log.i("hello", "doInBackground: ");
             Log.i("xyz", "文件的路径："+mFileInfo.getFilePath()+"文件的类型："+mFileInfo.getFileType()+"文件的大小："+mFileInfo.getSize()/1024+"kb");
             copyFile(inputstream, new FileOutputStream(f),mFileInfo);
 
@@ -134,7 +136,7 @@ public class FileServerAsyncTask extends
             return f.getAbsolutePath();
 
         } catch (IOException e) {
-            Log.e("xyz", e.toString());
+            Log.e("hello", e.toString());
             return null;
         }
     }
@@ -239,7 +241,8 @@ public class FileServerAsyncTask extends
         String jsonStr = new String(headerBytes, UTF_8);
         String[] strArray = jsonStr.split(SPERATOR);
         jsonStr = strArray[1].trim();
-        mFileInfo = FileInfo.toObject(jsonStr);
+        mFileInfo = FileInfo.toObject(jsonStr);Log.i("mFileInfo", String.valueOf(mFileInfo));
+
     }
 
     //历史记录存储
