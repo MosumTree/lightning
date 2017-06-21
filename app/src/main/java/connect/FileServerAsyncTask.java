@@ -132,7 +132,7 @@ public class FileServerAsyncTask extends
             Log.i("xyz", "文件的路径："+mFileInfo.getFilePath()+"文件的类型："+mFileInfo.getFileType()+"文件的大小："+mFileInfo.getSize()/1024+"kb");
             copyFile(inputstream, new FileOutputStream(f),mFileInfo);
 
-            serverSocket.close();
+            //serverSocket.close();
             return f.getAbsolutePath();
 
         } catch (IOException e) {

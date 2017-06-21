@@ -127,7 +127,7 @@ public class FileTransferService extends IntentService{
                 Log.d("xyz", "Client: Data written");
             } catch (IOException e) {
                 Log.e("xyz", e.getMessage());
-            } finally {
+            } /*finally {
                 if (socket != null) {
                     if (socket.isConnected()) {
                         try {
@@ -138,7 +138,7 @@ public class FileTransferService extends IntentService{
                         }
                     }
                 }
-            }
+            }*/
 
         }
     }
